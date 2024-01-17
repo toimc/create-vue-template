@@ -5,70 +5,88 @@ import path from 'path'
 import _ from 'lodash'
 import ejs from 'ejs'
 
+prompts.override({ cancelled: true })
+
+const onCancel = () => {
+  console.log('用户主动退出程序')
+  process.exit()
+  // return false
+}
+
 async function init() {
-  const response = await prompts([
+  const response = await prompts(
+    [
+      {
+        type: 'text',
+        name: 'pkgName',
+        message: '请输入项目的名称',
+        // 对用于的目录名加入校验 校验是不是中文字符等
+        validate: (value) =>
+          !/^(?:@[a-z0-9-*~][a-z0-9-*._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/.test(value)
+            ? `项目名称不符合npm包规则，建议请使用英文小写加短横线`
+            : true
+      },
+      {
+        type: 'multiselect',
+        name: 'config',
+        message: '选择项目的基础配置模块',
+        choices: [
+          { title: 'unplugin-vue-router，自动路由', value: 'router' },
+          {
+            title: 'vite-plugin-vue-layouts，全局layout布局注册组件',
+            value: 'layout'
+          },
+          { title: 'vite-plugin-mock，mock接口', value: 'mock' }
+        ],
+        hint: '- 空格用于 选择/取消选择 切换，回车用于确认选择'
+      },
+      {
+        type: 'select',
+        name: 'css',
+        message: '请选择一个 css Framework：',
+        choices: [
+          {
+            title: 'unocss',
+            description: 'UnoCSS - Instant On-demand Atomic CSS Engine',
+            value: 'unocss'
+          },
+          {
+            title: 'tailwind',
+            value: 'tailwind',
+            description: 'TailWind CSS - A utility-first CSS framework'
+          }
+        ],
+        initial: 0
+      },
+      {
+        type: 'toggle',
+        name: 'cdn',
+        message: '是否需要配置 cdn加速？',
+        initial: true,
+        active: 'yes',
+        inactive: 'no'
+      },
+      {
+        type: 'toggle',
+        name: 'electron',
+        message: '是否需要配置 electron？',
+        initial: false,
+        active: 'yes',
+        inactive: 'no'
+      },
+      {
+        type: (prev) => (prev === false ? 'toggle' : null),
+        name: 'pwa',
+        message: '是否需要配置 pwa？',
+        initial: true,
+        active: 'yes',
+        inactive: 'no'
+      }
+    ],
     {
-      type: 'text',
-      name: 'pkgName',
-      message: '请输入项目的名称'
-    },
-    {
-      type: 'multiselect',
-      name: 'config',
-      message: '选择项目的基础配置模块',
-      choices: [
-        { title: 'unplugin-vue-router，自动路由', value: 'router' },
-        {
-          title: 'vite-plugin-vue-layouts，全局layout布局注册组件',
-          value: 'layout'
-        },
-        { title: 'vite-plugin-mock，mock接口', value: 'mock' }
-      ],
-      hint: '- 空格用于 选择/取消选择 切换，回车用于确认选择'
-    },
-    {
-      type: 'select',
-      name: 'css',
-      message: '请选择一个 css Framework：',
-      choices: [
-        {
-          title: 'unocss',
-          description: 'UnoCSS - Instant On-demand Atomic CSS Engine',
-          value: 'unocss'
-        },
-        {
-          title: 'tailwind',
-          value: 'tailwind',
-          description: 'TailWind CSS - A utility-first CSS framework'
-        }
-      ],
-      initial: 0
-    },
-    {
-      type: 'toggle',
-      name: 'cdn',
-      message: '是否需要配置 cdn加速？',
-      initial: true,
-      active: 'yes',
-      inactive: 'no'
-    },
-    {
-      type: 'toggle',
-      name: 'electron',
-      message: '是否需要配置 electron？',
-      initial: false,
-      active: 'yes',
-      inactive: 'no'
-    },
-    {
-      type: (prev) => (prev === false ? 'toggle' : null),
-      name: 'pwa',
-      message: '是否需要配置 pwa？',
-      initial: true,
-      active: 'yes',
-      inactive: 'no'
+      onCancel
     }
-  ])
+  )
   // console.log(response) // => { value: 24 }
   await processTemplates(response)
 }
@@ -77,14 +95,52 @@ const isSkippedFile = (filePath) => {
   return ['.data.ts', '.ejs'].some((o) => filePath.endsWith(o))
 }
 
+async function checkAndPrompt(destDir) {
+  // 检查目录是否存在
+  const dirExists = await fse.pathExists(destDir)
+
+  if (dirExists) {
+    // 检查目录是否为空
+    const files = await fse.readdir(destDir)
+    const dirIsEmpty = files.length === 0
+
+    if (!dirIsEmpty) {
+      // 提示用户是否覆盖目录
+      const response = await prompts(
+        {
+          type: 'toggle',
+          name: 'overwrite',
+          message: '目标目录已存在且不为空，是否要覆盖?',
+          initial: false,
+          active: 'yes',
+          inactive: 'no'
+        },
+        {
+          onCancel
+        }
+      )
+
+      if (response.overwrite) {
+        // 删除目录
+        fse.removeSync(destDir)
+        console.log(`已覆盖目录 ${destDir}`)
+      } else {
+        console.log('操作已取消')
+        process.exit()
+      }
+    }
+  }
+}
+
 async function processTemplates(options) {
   const { pkgName, ...rest } = options
   const cwd = process.cwd()
   const sourceDir = path.join(__dirname, '../templates/base')
-  // TODO 对用于的目录名加入校验 校验是不是中文字符等
+
   const destDir = path.join(cwd, pkgName)
   try {
-    // TODO 判断目录是否存在，是否有文件，是否需要覆盖
+    // 判断目录是否存在，是否有文件，是否需要覆盖
+    await checkAndPrompt(destDir)
     fse.removeSync(destDir)
 
     fse.copySync(sourceDir, destDir)
