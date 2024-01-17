@@ -14,6 +14,9 @@ importers:
       fs-extra:
         specifier: ^11.2.0
         version: 11.2.0
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       prompts:
         specifier: ^2.4.2
         version: 2.4.2
@@ -103,12 +106,6 @@ importers:
         specifier: ^4.2.5
         version: 4.2.5(vue@3.4.10)
     devDependencies:
-      '@iconify/json':
-        specifier: ^2.2.142
-        version: 2.2.167
-      '@iconify/vue':
-        specifier: ^4.1.1
-        version: 4.1.1(vue@3.4.10)
       '@intlify/unplugin-vue-i18n':
         specifier: ^1.5.0
         version: 1.6.0(rollup@3.29.4)(vue-i18n@9.9.0)
@@ -1020,26 +1017,6 @@ packages:
 
   /@humanwhocodes/object-schema@2.0.2:
     resolution: {integrity: sha512-6EwiSjwWYP7pTckG6I5eyFANjPhmPjUX9JRLUSfNPC7FX7zK9gyZAfUEaECL6ALTpGX5AjnBq3C9XmVWPitNpw==}
-    dev: true
-
-  /@iconify/json@2.2.167:
-    resolution: {integrity: sha512-5VFebxiHKApn9U9IFuBniJ0BSlDfDhkyNsWIVGYwBT9jSW2HSQJhybnuBh8EiEi2KL3l8NF7QP86RrJfWgRsNA==}
-    dependencies:
-      '@iconify/types': 2.0.0
-      pathe: 1.1.2
-    dev: true
-
-  /@iconify/types@2.0.0:
-    resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
-    dev: true
-
-  /@iconify/vue@4.1.1(vue@3.4.10):
-    resolution: {integrity: sha512-RL85Bm/DAe8y6rT6pux7D2FJSiUEM/TPfyK7GrbAOfTSwrhvwJW+S5yijdGcmtXouA8MtuH9C7l4hiSE4mLMjg==}
-    peerDependencies:
-      vue: '>=3'
-    dependencies:
-      '@iconify/types': 2.0.0
-      vue: 3.4.10(typescript@5.2.2)
     dev: true
 
   /@intlify/bundle-utils@7.5.0(vue-i18n@9.9.0):
