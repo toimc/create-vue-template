@@ -6,11 +6,11 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 
-import { viteMockServe } from 'vite-plugin-mock'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import I18n from '@intlify/unplugin-vue-i18n/vite'
 import { visualizer } from 'rollup-plugin-visualizer'
 
+<%- importers.join("\n") %>
 // 过滤element-plus的.mjs的文件，不打包不需要的locales
 // 判断，/locales中对应的文件名的.mjs文件作为过滤条件 -> 保留
 function customExternals(id: string) {
@@ -31,13 +31,8 @@ function customExternals(id: string) {
 }
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
-  const isProd = mode === 'production'
-  const base = isProd ? process.env.BASE_PATH || '/' : './'
-
-  const isAnalysis = process.env.ANALYSIS === 'true'
-  const isSourceMap = process.env.SOURCE_MAP === 'true'
-
+export default defineConfig(({ mode, command }) => {
+  <%- params && params.join("\n") %>
   return {
     base,
     build: {
@@ -48,6 +43,7 @@ export default defineConfig(({ mode }) => {
     },
 
     plugins: [
+      <%- plugins.join(",") %>,
       vue({
         script: {
           defineModel: true,
@@ -55,17 +51,6 @@ export default defineConfig(({ mode }) => {
         }
       }),
       vueJsx(),
-      // Vue3.3以后，不需要这些新的特性了
-      // VueMacros.vite({
-      //   plugins: {
-      //     vue: vue(),
-      //     vueJsx: vueJsx() // 如果需要
-      //   }
-      // }),
-      viteMockServe({
-        mockPath: 'mock',
-        enable: false
-      }),
       createSvgIconsPlugin({
         // 指定需要缓存的图标文件夹
         iconDirs: [path.resolve(process.cwd(), 'src/assets/icons')],
@@ -114,6 +99,7 @@ export default defineConfig(({ mode }) => {
             // 'element-plus/es/components/loading/style/css',
             'sortablejs'
           ]
-    }
+    },
+    <%- typeof optimizeDeps !== 'undefined' ? optimizeDeps : '' %>
   }
 })
