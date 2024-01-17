@@ -5,8 +5,7 @@ export default function getData() {
       `viteMockServe({
         mockPath: 'mock',
         enable: false
-      })
-    `
+      })`
     ]
   }
 }

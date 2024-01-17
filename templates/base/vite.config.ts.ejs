@@ -32,7 +32,7 @@ function customExternals(id: string) {
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode, command }) => {
-  <%- params && params.join("\n") %>
+  <%- typeof params !=='undefined' ? params.join("\n") : '' %>
   return {
     base,
     build: {

@@ -1,6 +1,6 @@
 export default function getData() {
   return {
-    importers: ["import { cdn } from 'vite-plugin-cdn2';"],
+    importers: ["import { cdn } from 'vite-plugin-cdn2'"],
     plugins: [
       `
       cdn({
