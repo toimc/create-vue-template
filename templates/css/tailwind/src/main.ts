@@ -10,6 +10,13 @@ if (import.meta.env.MODE !== 'production') {
   import('element-plus/theme-chalk/dark/css-vars.css')
 }
 
+// import 'reset-css'
+// import '@unocss/reset/normalize.css'
+
+// https://github.com/unocss/unocss/issues/2127
+// import '@unocss/reset/tailwind.css'
+import './assets/tailwind.css'
+
 import 'virtual:svg-icons-register'
 import { I18nModule } from 'el-admin-components'
 import 'el-admin-components/style'

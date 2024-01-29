@@ -42,7 +42,6 @@
     "pre-commit": "pnpm lint-staged"
   },
   "lint-staged": {
-    "*.{js,ts}": "eslint --fix --ignore-path .eslintignore",
     "*.{js,ts,json}": "prettier --write --ignore-path .gitignore"
   },
   "engines": {
