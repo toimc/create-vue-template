@@ -1,6 +1,6 @@
 {
   "name": "create-vue-template",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "A CLI for create vue-admin template",
   "keywords": [],
   "author": "brian <admin@wayearn.com>",

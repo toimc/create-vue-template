@@ -173,6 +173,34 @@ async function checkAndPrompt(destDir) {
   }
 }
 
+async function copyAndRename(sourceDir, destDir) {
+  // 递归遍历目录和文件
+  async function processDirectory(dir) {
+    const files = await fse.readdir(dir)
+
+    for (const file of files) {
+      const sourcePath = path.join(dir, file)
+      const destPath = path.join(destDir, path.relative(sourceDir, sourcePath))
+
+      const stats = await fse.stat(sourcePath)
+      if (stats.isDirectory()) {
+        await fse.ensureDir(destPath)
+        await processDirectory(sourcePath)
+      } else {
+        if (path.extname(file) === '.ejs') {
+          // 如果文件是 .ejs 后缀，则在复制时重命名
+          await fse.copy(sourcePath, destPath.replace(/\.ejs$/, ''))
+        } else {
+          // 直接复制其他文件
+          await fse.copy(sourcePath, destPath)
+        }
+      }
+    }
+  }
+
+  await processDirectory(sourceDir)
+}
+
 async function processTemplates(options) {
   const { pkgName, ...rest } = options
   const cwd = process.cwd()
@@ -182,10 +210,8 @@ async function processTemplates(options) {
   try {
     // 判断目录是否存在，是否有文件，是否需要覆盖
     await checkAndPrompt(destDir)
-    fse.removeSync(destDir)
-
-    fse.copySync(sourceDir, destDir)
-    fse.rename(path.join(destDir, 'vite.config.ts.ejs'), path.join(destDir, 'vite.config.ts'))
+    await fse.remove(destDir)
+    await copyAndRename(sourceDir, destDir)
 
     const mapData = {}
     let templatesDir = path.join(__dirname, '../templates')
