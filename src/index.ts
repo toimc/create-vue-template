@@ -180,13 +180,18 @@ async function copyAndRename(sourceDir, destDir) {
 
     for (const file of files) {
       const sourcePath = path.join(dir, file)
-      const destPath = path.join(destDir, path.relative(sourceDir, sourcePath))
+      let destPath = path.join(destDir, path.relative(sourceDir, sourcePath))
 
       const stats = await fse.stat(sourcePath)
       if (stats.isDirectory()) {
         await fse.ensureDir(destPath)
         await processDirectory(sourcePath)
       } else {
+        // 如果文件名以 "_" 开头，则在复制时替换为 "."
+        if (file.startsWith('_')) {
+          const fileName = file.replace(/^_/, '.')
+          destPath = destPath.replace(file, fileName)
+        }
         if (path.extname(file) === '.ejs') {
           // 如果文件是 .ejs 后缀，则在复制时重命名
           await fse.copy(sourcePath, destPath.replace(/\.ejs$/, ''))
