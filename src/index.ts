@@ -33,7 +33,8 @@ async function init() {
   })
   // console.log('🚀 ~ init ~ argv:', argv)
   const pkg = argv._[0]
-  if (isValidPackageName(pkg)) {
+  // allow pkg name to be a path
+  if (isValidPackageName(pkg) || pkg === '.') {
     argv.pkgName = pkg
     // 初始化模板
     // 加入对argv的校验，template参数
@@ -45,7 +46,8 @@ async function init() {
         electron: argv.electron !== undefined ? argv.electron : false,
         pwa: argv.pwa !== undefined && !argv.electron ? argv.pwa : false,
         cdn: argv.cdn !== undefined ? argv.cdn : false,
-        path: argv.path
+        path: argv.path,
+        template: argv.template
       }
       await processTemplates(defaultConfig)
       process.exit()
@@ -208,14 +210,14 @@ async function copyAndRename(sourceDir, destDir) {
 }
 
 async function processTemplates(options) {
-  const { pkgName, path: tmpPath, ...rest } = options
+  const { pkgName, path: tmpPath, template, ...rest } = options
   const cwd = tmpPath || process.cwd()
   const sourceDir = path.join(__dirname, '../templates/base')
 
   const destDir = path.join(cwd, pkgName)
   try {
     // 判断目录是否存在，是否有文件，是否需要覆盖
-    await checkAndPrompt(destDir)
+    if (!template) await checkAndPrompt(destDir)
     await fse.remove(destDir)
     await copyAndRename(sourceDir, destDir)
 

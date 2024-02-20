@@ -10,11 +10,11 @@
       "runtimeArgs": [
         "init",
         "vue-template",
-        "test",
+        ".",
         "--",
         "--template",
         "--path",
-        "/Users/toimc/Downloads/tmp/"
+        "/Users/toimc/Downloads/tmp/test"
       ],
       "runtimeExecutable": "npm",
       "skipFiles": ["<node_internals>/**"],
