@@ -7,7 +7,15 @@
     {
       "name": "Launch via NPM",
       "request": "launch",
-      "runtimeArgs": ["init", "vue-template", "test", "--", "--template"],
+      "runtimeArgs": [
+        "init",
+        "vue-template",
+        "test",
+        "--",
+        "--template",
+        "--path",
+        "/Users/toimc/Downloads/tmp/"
+      ],
       "runtimeExecutable": "npm",
       "skipFiles": ["<node_internals>/**"],
       "type": "node",

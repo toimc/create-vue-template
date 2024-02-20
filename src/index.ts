@@ -44,7 +44,8 @@ async function init() {
         css: argv.css || 'unocss',
         electron: argv.electron !== undefined ? argv.electron : false,
         pwa: argv.pwa !== undefined && !argv.electron ? argv.pwa : false,
-        cdn: argv.cdn !== undefined ? argv.cdn : false
+        cdn: argv.cdn !== undefined ? argv.cdn : false,
+        path: argv.path
       }
       await processTemplates(defaultConfig)
       process.exit()
@@ -207,8 +208,8 @@ async function copyAndRename(sourceDir, destDir) {
 }
 
 async function processTemplates(options) {
-  const { pkgName, ...rest } = options
-  const cwd = process.cwd()
+  const { pkgName, path: tmpPath, ...rest } = options
+  const cwd = tmpPath || process.cwd()
   const sourceDir = path.join(__dirname, '../templates/base')
 
   const destDir = path.join(cwd, pkgName)
